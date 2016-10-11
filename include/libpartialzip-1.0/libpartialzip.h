@@ -29,14 +29,10 @@ extern "C" {
 #include <inttypes.h>
 #include <curl/curl.h>
 
-#ifdef _MSC_VER
-#define STATIC_INLINE static __inline
-#else
-#define STATIC_INLINE static inline
-#endif
-
-
 #ifdef _WIN32
+#ifndef _MSC_VER
+#define _MSC_VER
+#endif
 #define fseeko fseeko64
 #define ftello ftello64
 #define off_t off64_t
@@ -45,6 +41,12 @@ extern "C" {
 #define sleep(n) Sleep(1000 * n)
 #else
 #define PATH_SEPARATOR "/"
+#endif
+
+#ifdef _MSC_VER
+#define STATIC_INLINE static __inline
+#else
+#define STATIC_INLINE static inline
 #endif
 
 #define TRUE 1
