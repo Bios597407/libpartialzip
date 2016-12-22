@@ -28,6 +28,7 @@ extern "C" {
 
 #include <inttypes.h>
 #include <curl/curl.h>
+#include <string.h>
 
 #ifdef _WIN32
 #ifndef _MSC_VER
