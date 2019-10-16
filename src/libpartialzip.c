@@ -1,23 +1,23 @@
-/**
-  * libpartialzip-1.0 - libpartialzip.c
-  * Copyright (C) 2010 David Wang
-  *
-  * Modified by:
-  * Copyright (C) 2010-2013 Joshua Hill
-  *
-  * This program is free software: you can redistribute it and/or modify
-  * it under the terms of the GNU General Public License as published by
-  * the Free Software Foundation, either version 3 of the License, or
-  * (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  * GNU General Public License for more details.
-  *
-  * You should have received a copy of the GNU General Public License
-  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- **/
+/*
+ * libpartialzip.c
+ * Copyright © 2010 David Wang
+ *
+ * Modified by:
+ * Copyright © 2010-2013 Joshua Hill
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,13 +27,12 @@
 
 #include <zlib.h>
 #include <curl/curl.h>
+#include <libpartialzip-1.0/libpartialzip.h>
 
 #ifdef __cplusplus
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 #endif
-
-#include <libpartialzip-1.0/libpartialzip.h>
 
 static size_t count = 0;
 char endianness = IS_LITTLE_ENDIAN;
@@ -133,19 +132,19 @@ static partialzip_file_t* flipFiles(partialzip_t* info)
 		FLIPENDIANLE(candidate->signature);
 		FLIPENDIANLE(candidate->version);
 		FLIPENDIANLE(candidate->versionExtract);
-		// FLIPENDIANLE(candidate->flags);
+	     // FLIPENDIANLE(candidate->flags);
 		FLIPENDIANLE(candidate->method);
 		FLIPENDIANLE(candidate->modTime);
 		FLIPENDIANLE(candidate->modDate);
-		// FLIPENDIANLE(candidate->crc32);
+	     // FLIPENDIANLE(candidate->crc32);
 		FLIPENDIANLE(candidate->compressedSize);
 		FLIPENDIANLE(candidate->size);
 		FLIPENDIANLE(candidate->lenFileName);
 		FLIPENDIANLE(candidate->lenExtra);
 		FLIPENDIANLE(candidate->lenComment);
 		FLIPENDIANLE(candidate->diskStart);
-		// FLIPENDIANLE(candidate->internalAttr);
-		// FLIPENDIANLE(candidate->externalAttr);
+	     // FLIPENDIANLE(candidate->internalAttr);
+	     // FLIPENDIANLE(candidate->externalAttr);
 		FLIPENDIANLE(candidate->offset);
 
 		cur += sizeof(partialzip_file_t) + candidate->lenFileName + candidate->lenExtra + candidate->lenComment;
@@ -164,20 +163,17 @@ partialzip_t* partialzip_open(const char* url)
 	info->progressCallback = NULL;
 
 	info->hIPSW = curl_easy_init();
-
 	curl_easy_setopt(info->hIPSW, CURLOPT_URL, info->url);
 	curl_easy_setopt(info->hIPSW, CURLOPT_FOLLOWLOCATION, 1);
 	curl_easy_setopt(info->hIPSW, CURLOPT_NOBODY, 1);
 	curl_easy_setopt(info->hIPSW, CURLOPT_WRITEFUNCTION, dummyReceive);
 
-	if(strncmp(info->url, "file://", 7) == 0)
-	{
+	if(strncmp(info->url, "file://", 7) == 0) {
 		char path[1024];
 		strcpy(path, info->url + 7);
 		char* filePath = (char*) curl_easy_unescape(info->hIPSW, path, 0,  NULL);
 		FILE* f = fopen(filePath, "rb");
-		if(!f)
-		{
+		if(!f) {
 			curl_free(filePath);
 			curl_easy_cleanup(info->hIPSW);
 			free(info->url);
@@ -191,9 +187,7 @@ partialzip_t* partialzip_open(const char* url)
 		fclose(f);
 
 		curl_free(filePath);
-	}
-	else
-	{
+	} else {
 		curl_easy_perform(info->hIPSW);
 
 		double dFileLength;
@@ -225,12 +219,10 @@ partialzip_t* partialzip_open(const char* url)
 		partialzip_end_of_cd_t* candidate = (partialzip_end_of_cd_t*) cur;
 		uint32_t signature = candidate->signature;
 		FLIPENDIANLE(signature);
-		if(signature == 0x06054b50)
-		{
+		if(signature == 0x06054b50) {
 			uint16_t lenComment = candidate->lenComment;
 			FLIPENDIANLE(lenComment);
-			if((cur + lenComment + sizeof(partialzip_end_of_cd_t)) == (info->centralDirectoryEnd + info->centralDirectoryEndRecvd))
-			{
+			if((cur + lenComment + sizeof(partialzip_end_of_cd_t)) == (info->centralDirectoryEnd + info->centralDirectoryEndRecvd)) {
 				FLIPENDIANLE(candidate->diskNo);
 				FLIPENDIANLE(candidate->CDDiskNo);
 				FLIPENDIANLE(candidate->CDDiskEntries);
@@ -245,12 +237,12 @@ partialzip_t* partialzip_open(const char* url)
 
 	}
 
-	if(info->centralDirectoryDesc)
-	{
+	if(info->centralDirectoryDesc) {
 		info->centralDirectory = (char*)malloc(info->centralDirectoryDesc->CDSize);
 		start = info->centralDirectoryDesc->CDOffset;
 		end = start + info->centralDirectoryDesc->CDSize - 1;
 		sprintf(sRange, "%" PRIu64 "-%" PRIu64, start, end);
+
 		curl_easy_setopt(info->hIPSW, CURLOPT_WRITEFUNCTION, receiveCentralDirectory);
 		curl_easy_setopt(info->hIPSW, CURLOPT_WRITEDATA, info);
 		curl_easy_setopt(info->hIPSW, CURLOPT_RANGE, sRange);
@@ -260,9 +252,7 @@ partialzip_t* partialzip_open(const char* url)
 		flipFiles(info);
 
 		return info;
-	}
-	else 
-	{
+	} else {
 		curl_easy_cleanup(info->hIPSW);
 		free(info->url);
 		free(info);
@@ -334,11 +324,11 @@ unsigned char* partialzip_get_file(partialzip_t* info, partialzip_file_t* file)
 	
 	FLIPENDIANLE(localHeader.signature);
 	FLIPENDIANLE(localHeader.versionExtract);
-	// FLIPENDIANLE(localHeader.flags);
+     // FLIPENDIANLE(localHeader.flags);
 	FLIPENDIANLE(localHeader.method);
 	FLIPENDIANLE(localHeader.modTime);
 	FLIPENDIANLE(localHeader.modDate);
-	// FLIPENDIANLE(localHeader.crc32);
+     // FLIPENDIANLE(localHeader.crc32);
 	FLIPENDIANLE(localHeader.compressedSize);
 	FLIPENDIANLE(localHeader.size);
 	FLIPENDIANLE(localHeader.lenFileName);
@@ -358,8 +348,7 @@ unsigned char* partialzip_get_file(partialzip_t* info, partialzip_file_t* file)
 	curl_easy_setopt(info->hIPSW, CURLOPT_HTTPGET, 1);
 	curl_easy_perform(info->hIPSW);
 
-	if(file->method == 8)
-	{
+	if(file->method == 8) {
 		unsigned char* uncData = (unsigned char*) malloc(file->size);
 		z_stream strm;
 		strm.zalloc = Z_NULL;
@@ -395,7 +384,6 @@ void partialzip_close(partialzip_t* info)
 
 	curl_global_cleanup();
 }
-
 
 void partialzip_free_file(partialzip_file_t* file) {
 	if(file) {

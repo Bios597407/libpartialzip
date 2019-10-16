@@ -1,23 +1,23 @@
-/**
-  * libpartialzip-1.0 - libpartialzip.h
-  * Copyright (C) 2010 David Wang
-  *
-  * Modified by:
-  * Copyright (C) 2010-2013 Joshua Hill
-  *
-  * This program is free software: you can redistribute it and/or modify
-  * it under the terms of the GNU General Public License as published by
-  * the Free Software Foundation, either version 3 of the License, or
-  * (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  * GNU General Public License for more details.
-  *
-  * You should have received a copy of the GNU General Public License
-  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- **/
+/*
+ * libpartialzip.h
+ * Copyright © 2010 David Wang
+ *
+ * Modified by:
+ * Copyright © 2010-2013 Joshua Hill
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #ifndef LIBPARTIAL_H
 #define LIBPARTIAL_H
@@ -190,7 +190,6 @@ typedef struct {
 #endif
 
 typedef struct partialzip_info partialzip_t;
-
 typedef void (*partialzip_progress_callback_t)(partialzip_t* info, partialzip_file_t* file, size_t progress);
 
 struct partialzip_info {
@@ -204,7 +203,6 @@ struct partialzip_info {
 	size_t centralDirectoryEndRecvd;
 	partialzip_progress_callback_t progressCallback;
 };
-
 
 partialzip_t* partialzip_open(const char* url);
 partialzip_file_t* partialzip_find_file(partialzip_t* info, const char* fileName);
