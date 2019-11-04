@@ -5,6 +5,7 @@
 *.o
 *.la
 *.lo
+*.so
 */partialzip*
 aclocal.m4
 autom4te.cache
@@ -17,7 +18,7 @@ libpartialzip-1.0.pc
 libtool
 ltmain.sh
 m4
-Makefile
-Makefile.in
+*Makefile
+*Makefile.in
 missing
 stamp-h1
